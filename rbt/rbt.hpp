@@ -1,4 +1,12 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
 namespace rbt {
+
+inline constexpr const char *COLOR_RED = "\x1b[31m";
+inline constexpr const char *COLOR_RESET = "\x1b[0m";
 
 enum Color { BLACK, RED };
 
@@ -38,5 +46,21 @@ template <typename T> Node<T> *insert(Node<T> *&root, T data) {
   }
   // TODO: Fixup
   return root;
+}
+
+template <typename T>
+void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
+  if (root != NIL<T>()) {
+    cout << prefix;
+    cout << (isLeft && root->left != NIL<T>() ? "├──" : "└──");
+    root->color == RED ? cout << COLOR_RED << root->data << COLOR_RESET << endl
+                       : cout << root->data << endl;
+    pretty_print(prefix + (isLeft ? "│  " : "  "), root->left, true);
+    pretty_print(prefix + (isLeft ? "│  " : "  "), root->right, false);
+  }
+}
+
+template <typename T> void pretty_print(Node<T> *&root) {
+  pretty_print("", root, false);
 }
 } // namespace rbt
