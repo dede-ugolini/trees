@@ -45,7 +45,58 @@ template <typename T> Node<T> *insert(Node<T> *&root, T data) {
     y->right = z;
   }
   // TODO: Fixup
+  insert_fixup(root, z);
   return root;
+}
+
+template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
+  while (child->parent->color == RED) {
+    // Tio está do lado direito ou é NIL, pai está no lado esquerdo do avô
+    if (child->parent == child->parent->parent->left) {
+      Node<T> *uncle = child->parent->parent->right;
+      // Tio vermelho
+      if (uncle->color == RED) {
+        // Colorir avô, tio e pai
+        uncle->color = BLACK;
+        child->parent->color = BLACK;
+        child->parent->parent->color = RED;
+        // Subir a verificação pra cima
+        child = child->parent->parent;
+      }
+      // Tio preto ou NIL
+      else {
+        // Verificar se é RR (linha) ou RL (Triangulo)
+        // Triangulo
+        if (child == child->parent->right) {
+          // TODO:: leftRotate
+        }
+        // Linha: pende a direita
+        // TODO: rightRotate
+      }
+    }
+    // Tio está do lado esquerdo ou é NIL, pai está no lado direito do avô
+    else {
+      Node<T> *uncle = child->parent->parent->left;
+      if (uncle->color == RED) {
+        uncle->color = BLACK;
+        child->parent->color = BLACK;
+        child->parent->parent->color = RED;
+        // Subir a verificação pra cima
+        child = child->parent->parent;
+      }
+      // Tio preto ou NIL
+      else {
+        // Verificar se é LL (linha) ou LR (Triangulo)
+        // Linha: pende a esquerda
+        if (child == child->parent->left) {
+          // TODO:: rightRotate
+        }
+        // Triangulo
+        // TODO: leftRotate
+      }
+    }
+  }
+  root->color = BLACK;
 }
 
 template <typename T>
