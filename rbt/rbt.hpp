@@ -63,4 +63,13 @@ void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
 template <typename T> void pretty_print(Node<T> *&root) {
   pretty_print("", root, false);
 }
+
+template <typename T> void purge(Node<T> *&root) {
+  if (root != NIL<T>()) {
+    purge(root->left);
+    purge(root->right);
+    delete root;
+    root = nullptr;
+  }
+}
 } // namespace rbt
