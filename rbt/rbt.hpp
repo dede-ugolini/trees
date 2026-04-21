@@ -49,6 +49,54 @@ template <typename T> Node<T> *insert(Node<T> *&root, T data) {
   return root;
 }
 
+template <typename T> void right_rotate(Node<T> *&root, Node<T> *x) {
+  // Define o node y
+  Node<T> *y = x->left;
+  // Subtree a esquerda de x vira a Subtree a direita de y
+  x->left = y->right;
+  if (y->right != NIL<T>()) {
+    y->right->parent = x;
+  }
+  // Liga o pai de x a y
+  y->parent = x->parent;
+
+  // Pai de x é NIL então x era a própria raiz
+  if (x->parent == NIL<T>()) {
+    root = y;
+  }
+
+  else if (x == x->parent->right) {
+    x->parent->right = y;
+  }
+
+  else {
+    x->parent->left = y;
+  }
+
+  y->right = x;
+  x->parent = y;
+}
+
+template <typename T> void left_rotate(Node<T> *&root, Node<T> *x) {
+  Node<T> *y = x->right;
+  x->right = y->left;
+
+  if (y->left != NIL<T>()) {
+    y->left->parent = x;
+  }
+
+  y->parent = x->parent;
+  if (x->parent == NIL<T>()) {
+    root = y;
+  } else if (x == x->parent->left) {
+    x->parent->left = y;
+  } else {
+    x->parent->right = y;
+  }
+  y->left = x;
+  x->parent = y;
+}
+
 template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
   while (child->parent->color == RED) {
     // Tio está do lado direito ou é NIL, pai está no lado esquerdo do avô
@@ -57,21 +105,26 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
       // Tio vermelho
       if (uncle->color == RED) {
         // Colorir avô, tio e pai
-        uncle->color = BLACK;
-        child->parent->color = BLACK;
-        child->parent->parent->color = RED;
+        uncle->color = BLACK;               // Caso 1
+        child->parent->color = BLACK;       // Caso 1
+        child->parent->parent->color = RED; // Caso 1
         // Subir a verificação pra cima
-        child = child->parent->parent;
+        child = child->parent->parent; // Caso 1
       }
       // Tio preto ou NIL
       else {
-        // Verificar se é RR (linha) ou RL (Triangulo)
+        // Verificar se é LL (linha) ou LR (Triangulo)
         // Triangulo
-        if (child == child->parent->right) {
-          // TODO:: leftRotate
+        if (child == child->parent->right) { // Caso 2
+          // No caso Triangulo deve se rotacionar o pai
+          child = child->parent; // Caso 2
+          // Rotacionar para a esquerda para a subtree ficar em linha
+          left_rotate(root, child); // Caso 2
         }
-        // Linha: pende a direita
-        // TODO: rightRotate
+        // Linha: pende a esquerda
+        child->parent->color = BLACK;
+        child->parent->parent->color = RED;
+        right_rotate(root, child->parent->parent);
       }
     }
     // Tio está do lado esquerdo ou é NIL, pai está no lado direito do avô
@@ -89,7 +142,7 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
         // Verificar se é LL (linha) ou LR (Triangulo)
         // Linha: pende a esquerda
         if (child == child->parent->left) {
-          // TODO:: rightRotate
+          right_rotate(root, child->parent->parent);
         }
         // Triangulo
         // TODO: leftRotate
