@@ -140,11 +140,15 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
       // Tio preto ou NIL
       else {
         // Verificar se é LL (linha) ou LR (Triangulo)
-        // Linha: pende a esquerda
+        // Triangulo
         if (child == child->parent->left) {
+          child = child->parent; // Caso 2
           right_rotate(root, child->parent->parent);
         }
-        // Triangulo
+        // Linha: pende a direita
+        child->parent->color = BLACK;
+        child->parent->parent->color = RED;
+        left_rotate(root, child->parent->parent);
       }
     }
   }
