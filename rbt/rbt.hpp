@@ -181,6 +181,17 @@ template <typename T> void in_order_walk(Node<T> *&root) {
   in_order_walk(root->right);
 }
 
+template <typename T> void pre_order_walk(Node<T> *&root) {
+  if (root == NIL<T>()) {
+    return;
+  }
+  root->color == RED
+      ? std::cout << COLOR_RED << root->data << COLOR_RESET << std::endl
+      : std::cout << root->data << std::endl;
+  in_order_walk(root->left);
+  in_order_walk(root->right);
+}
+
 template <typename T> void purge(Node<T> *&root) {
   if (root != NIL<T>()) {
     purge(root->left);
