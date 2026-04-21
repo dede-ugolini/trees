@@ -169,6 +169,14 @@ template <typename T> Node<T> *search(Node<T> *&root, T data) {
   return NIL<T>();
 }
 
+template <typename T> Node<T> *min(Node<T> *&root) {
+  Node<T> *x = root;
+  while (x->left != NIL<T>()) {
+    x = x->left;
+  }
+  return x;
+}
+
 template <typename T>
 void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
   cout << prefix;
