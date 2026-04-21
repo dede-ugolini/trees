@@ -155,6 +155,20 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
   root->color = BLACK;
 }
 
+template <typename T> Node<T> *search(Node<T> *&root, T data) {
+  Node<T> *x = root;
+  while (x != NIL<T>()) {
+    if (data < x->data) {
+      x = x->left;
+    } else if (data > x->data) {
+      x = x->right;
+    } else {
+      return x;
+    }
+  }
+  return NIL<T>();
+}
+
 template <typename T>
 void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
   cout << prefix;
