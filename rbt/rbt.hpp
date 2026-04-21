@@ -145,7 +145,6 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
           right_rotate(root, child->parent->parent);
         }
         // Triangulo
-        // TODO: leftRotate
       }
     }
   }
@@ -154,14 +153,17 @@ template <typename T> void insert_fixup(Node<T> *&root, Node<T> *child) {
 
 template <typename T>
 void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
-  if (root != NIL<T>()) {
-    cout << prefix;
-    cout << (isLeft && root->left != NIL<T>() ? "├──" : "└──");
-    root->color == RED ? cout << COLOR_RED << root->data << COLOR_RESET << endl
-                       : cout << root->data << endl;
-    pretty_print(prefix + (isLeft ? "│  " : "  "), root->left, true);
-    pretty_print(prefix + (isLeft ? "│  " : "  "), root->right, false);
+  cout << prefix;
+  cout << (isLeft ? "├──" : "└──");
+
+  if (root == NIL<T>()) {
+    cout << "NIL" << endl;
+    return;
   }
+  root->color == RED ? cout << COLOR_RED << root->data << COLOR_RESET << endl
+                     : cout << root->data << endl;
+  pretty_print(prefix + (isLeft ? "│  " : "  "), root->left, true);
+  pretty_print(prefix + (isLeft ? "│  " : "  "), root->right, false);
 }
 
 template <typename T> void pretty_print(Node<T> *&root) {
