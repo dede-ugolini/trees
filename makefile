@@ -5,6 +5,9 @@ BIN := $(patsubst src/%.cpp, bin/%, $(SRC))
 
 all: bin $(BIN)
 
+clean:
+	rm -rf bin
+
 bin:
 	mkdir -p bin
 
