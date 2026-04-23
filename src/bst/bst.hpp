@@ -6,9 +6,9 @@ namespace bst {
 template <typename T> struct Node {
   T data;
   int height;
-  struct Node *left;
-  struct Node *right;
-  struct Node *parent;
+  Node<T> *left;
+  Node<T> *right;
+  Node<T> *parent;
 };
 
 template <typename T> void in_order_walk(Node<T> *root) {
@@ -138,22 +138,6 @@ template <typename T> static int height(Node<T> *root) {
   return 1 + std::max(left, right);
 }
 
-template <typename T> Node<T> *left_rotate(Node<T> *root) {
-  Node<T> *sub_tree = root->right;
-  Node<T> *sub_tree_child = sub_tree->left;
-  sub_tree->left = root;
-  root->right = sub_tree_child;
-  return sub_tree;
-}
-
-template <typename T> Node<T> *right_rotate(Node<T> *root) {
-  Node<T> *sub_tree = root->left;
-  Node<T> *sub_tree_child = sub_tree->right;
-  sub_tree->right = root;
-  root->left = sub_tree_child;
-  return sub_tree;
-}
-
 template <typename T> Node<T> *createNode(T data) {
   Node<T> *new_node = new Node<T>();
   new_node->data = data;
@@ -164,23 +148,30 @@ template <typename T> Node<T> *createNode(T data) {
   return new_node;
 }
 
-// Não suporta duplicatas
-template <typename T> Node<T> *insert(Node<T> *root, T data) {
+template <typename T> Node<T> *insert(Node<T> *&root, T data) {
 
   if (root == nullptr) {
     return createNode(data);
   }
+  Node<T> *z = createNode(data);
+  Node<T> *y = nullptr;
+  Node<T> *x = root;
 
-  if (data == root->data) {
-    return root;
+  while (x != nullptr) {
+    y = x;
+    if (z->data < x->data) {
+      x = x->left;
+    } else {
+      x = x->right;
+    }
   }
 
-  if (data < root->data) {
-    root->left = insert(root->left, data);
+  z->parent = y;
+  if (z->data < y->data) {
+    y->left = z;
   } else {
-    root->right = insert(root->right, data);
+    y->right = z;
   }
-
   return root;
 }
 
