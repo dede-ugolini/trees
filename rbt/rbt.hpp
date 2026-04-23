@@ -177,6 +177,96 @@ template <typename T> Node<T> *min(Node<T> *&root) {
   return x;
 }
 
+template <typename T> void transplant(Node<T> *&root, Node<T> *u, Node<T> *v) {
+  if (u->parent == NIL<T>()) {
+    root = v;
+  } else if (u == u->parent->left) {
+    u->parent->left = v;
+  } else {
+    u->parent->right = v;
+  }
+  v->parent = u->parent;
+}
+
+template <typename T> void remove(Node<T> *&root, T data) {
+  Node<T> *target = search(root, data);
+  if (target == NIL<T>()) {
+    return;
+  }
+  Node<T> *x = NIL<T>();
+  Node<T> *y = target;
+  Color y_original_color = y->color;
+  if (target->left == NIL<T>()) {
+    x = target->right;
+    transplant(root, target, target->right);
+  } else if (target->right == NIL<T>()) {
+    x = target->left;
+    transplant(root, target, target->left);
+  } else {
+    y = min(target->right);
+    y_original_color = y->color;
+    x = y->right;
+    if (y->parent == target) {
+      x->parent = y;
+    } else {
+      transplant(root, y, y->right);
+      y->right = target->right;
+      y->right->parent = y;
+    }
+    y->left = target->left;
+    y->left->parent = y;
+    y->color = target->color;
+    transplant(root, target, y);
+  }
+  if (y_original_color == BLACK) {
+    remove_fixup(root, y);
+  }
+  delete target;
+}
+
+template <typename T> void remove_fixup(Node<T> *&root, Node<T> *child) {
+  while (child != root && child->color == BLACK) {
+    // Child está do lado esquerdo e irmão do lado direito
+    if (child == child->parent->left) {
+      Node<T> *w = child->parent->right;
+      if (w->color == RED) {
+        w->color = BLACK;
+        w->parent->color = RED;
+        left_rotate(root, child->parent);
+        w = child->parent->right;
+      }
+      if (w->left->color == BLACK && w->right->color == BLACK) {
+        w->color = RED;
+        child = child->parent;
+      } else if (w->right->color == BLACK) {
+        w->left->color = BLACK;
+        w->color = RED;
+        right_rotate(root, w);
+        w = w->parent->right;
+      }
+    }
+    // Child está do lado direito e irmão do lado esquerdo
+    else {
+      Node<T> *w = child->parent->left;
+      if (w->color == RED) {
+        w->color = BLACK;
+        w->parent->color = RED;
+        right_rotate(root, child->parent);
+        w = child->parent->left;
+      }
+      if (w->left->color == BLACK && w->right->color == BLACK) {
+        w->color = RED;
+        child = child->parent;
+      } else if (w->left->color == BLACK) {
+        w->right->color = BLACK;
+        w->color = RED;
+        left_rotate(root, w);
+        w = w->parent->left;
+      }
+    }
+  }
+}
+
 template <typename T>
 void pretty_print(string prefix, Node<T> *&root, bool isLeft) {
   cout << prefix;
