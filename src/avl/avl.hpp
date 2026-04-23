@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <string>
 
 namespace avl {
 
@@ -169,6 +170,23 @@ template <typename T> void levelOrder(Node<T> *root) {
       q.push(root->right);
     }
   }
+}
+
+template <typename T>
+void pretty_print(std::string prefix, Node<T> *&root, bool isLeft) {
+  if (root == nullptr) {
+    return;
+  }
+  std::cout << prefix;
+  std::cout << (isLeft ? "├──" : "└──");
+
+  std::cout << root->data << std::endl;
+  pretty_print(prefix + (isLeft ? "│  " : "  "), root->left, true);
+  pretty_print(prefix + (isLeft ? "│  " : "  "), root->right, false);
+}
+
+template <typename T> void pretty_print(Node<T> *&root) {
+  pretty_print("", root, false);
 }
 
 } // namespace avl
