@@ -196,6 +196,7 @@ template <typename T> void remove(Node<T> *&root, T data) {
   Node<T> *x = NIL<T>();
   Node<T> *y = target;
   Color y_original_color = y->color;
+
   if (target->left == NIL<T>()) {
     x = target->right;
     transplant(root, target, target->right);
@@ -218,53 +219,91 @@ template <typename T> void remove(Node<T> *&root, T data) {
     y->color = target->color;
     transplant(root, target, y);
   }
+  // Só é necessário fazer correção quando o node removido era negro
   if (y_original_color == BLACK) {
     remove_fixup(root, y);
   }
   delete target;
 }
 
-template <typename T> void remove_fixup(Node<T> *&root, Node<T> *child) {
-  while (child != root && child->color == BLACK) {
-    // Child está do lado esquerdo e irmão do lado direito
-    if (child == child->parent->left) {
-      Node<T> *w = child->parent->right;
-      if (w->color == RED) {
-        w->color = BLACK;
-        w->parent->color = RED;
-        left_rotate(root, child->parent);
-        w = child->parent->right;
-      }
-      if (w->left->color == BLACK && w->right->color == BLACK) {
-        w->color = RED;
-        child = child->parent;
-      } else if (w->right->color == BLACK) {
-        w->left->color = BLACK;
-        w->color = RED;
-        right_rotate(root, w);
-        w = w->parent->right;
-      }
+template <typename T> bool is_black(Node<T> *n) { return n->color == BLACK; }
+
+template <typename T>
+void fix_case1(Node<T> *&root, Node<T> *&x, Node<T> *&w, bool left) {
+  w->color = BLACK;
+  x->parent->color = RED;
+
+  if (left)
+    left_rotate(root, x->parent);
+  else
+    right_rotate(root, x->parent);
+
+  w = left ? x->parent->right : x->parent->left;
+}
+
+template <typename T> void fix_case2(Node<T> *&x, Node<T> *w) {
+  w->color = RED;
+  x = x->parent;
+}
+
+template <typename T> void fix_case3(Node<T> *&root, Node<T> *&w, bool left) {
+  if (left) {
+    w->left->color = BLACK;
+    w->color = RED;
+    right_rotate(root, w);
+    w = w->parent->right;
+  } else {
+    w->right->color = BLACK;
+    w->color = RED;
+    left_rotate(root, w);
+    w = w->parent->left;
+  }
+}
+
+template <typename T>
+void fix_case4(Node<T> *&root, Node<T> *&x, Node<T> *w, bool left) {
+  w->color = x->parent->color;
+  x->parent->color = BLACK;
+
+  if (left) {
+    w->right->color = BLACK;
+    left_rotate(root, x->parent);
+  } else {
+    w->left->color = BLACK;
+    right_rotate(root, x->parent);
+  }
+
+  x = root;
+}
+
+template <typename T> void remove_fixup(Node<T> *&root, Node<T> *x) {
+  while (x != root && is_black(x)) {
+
+    bool left = (x == x->parent->left);
+    Node<T> *w = left ? x->parent->right : x->parent->left;
+
+    // Caso 1: o irmão w de x é vermelho
+    if (w->color == RED) {
+      fix_case1(root, x, w, left);
     }
-    // Child está do lado direito e irmão do lado esquerdo
-    else {
-      Node<T> *w = child->parent->left;
-      if (w->color == RED) {
-        w->color = BLACK;
-        w->parent->color = RED;
-        right_rotate(root, child->parent);
-        w = child->parent->left;
+
+    // Caso 2: o irmão w de x é preto e os filhos de w são pretos
+    if (is_black(w->left) && is_black(w->right)) {
+      fix_case2(x, w);
+    } else {
+
+      // Caso 3: o irmão w de x é preto, o filho esquerdo de w é vermelho e
+      // filho direito de w é preto
+      if ((left && is_black(w->right)) || (!left && is_black(w->left))) {
+        fix_case3(root, w, left);
       }
-      if (w->left->color == BLACK && w->right->color == BLACK) {
-        w->color = RED;
-        child = child->parent;
-      } else if (w->left->color == BLACK) {
-        w->right->color = BLACK;
-        w->color = RED;
-        left_rotate(root, w);
-        w = w->parent->left;
-      }
+
+      // Caso 4: o irmão w de x é preto e o filho direito de w é vermelho
+      fix_case4(root, x, w, left);
     }
   }
+
+  x->color = BLACK;
 }
 
 template <typename T>
