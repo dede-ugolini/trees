@@ -20,6 +20,34 @@ template <typename T> Node<T> *createNode(T data) {
   return nn;
 }
 
+template <typename T> void in_order_walk(Node<T> *root) {
+
+  if (root == nullptr) {
+    return;
+  }
+  in_order_walk(root->left);
+  std::cout << root->data << std::endl;
+  in_order_walk(root->right);
+}
+
+template <typename T> void pre_order_walk(Node<T> *root) {
+  if (root == nullptr) {
+    return;
+  }
+  std::cout << root->data << std::endl;
+  pre_order_walk(root->left);
+  pre_order_walk(root->right);
+}
+
+template <typename T> void post_order_walk(Node<T> *root) {
+  if (root == nullptr) {
+    return;
+  }
+  pre_order_walk(root->left);
+  pre_order_walk(root->right);
+  std::cout << root->data << std::endl;
+}
+
 template <typename T> static Node<T> *rightRotate(Node<T> *root) {
   Node<T> *t = root->left;
   Node<T> *u = t->right;
