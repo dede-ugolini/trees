@@ -147,12 +147,13 @@ template <typename T> Node<T> *deleteNode(Node<T> *root, T element) {
   return root;
 }
 
-template <typename T> void deleteAllNodes(Node<T> *&root) {
-  if (root) {
-    deleteAllNodes(root->left);
-    deleteAllNodes(root->right);
-    delete root;
+template <typename T> void purge(Node<T> *&root) {
+  if (root == nullptr) {
+    return;
   }
+  deleteAllNodes(root->left);
+  deleteAllNodes(root->right);
+  delete root;
   root = nullptr;
 }
 
