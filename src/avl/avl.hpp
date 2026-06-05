@@ -9,7 +9,6 @@ template <typename T> struct Node {
   T data;
   Node<T> *left;
   Node<T> *right;
-  Node<T> *parent;
 };
 
 template <typename T> Node<T> *createNode(T data) {
@@ -17,7 +16,6 @@ template <typename T> Node<T> *createNode(T data) {
   nn->data = data;
   nn->left = nullptr;
   nn->right = nullptr;
-  nn->parent = nullptr;
   return nn;
 }
 
@@ -83,15 +81,14 @@ template <typename T> Node<T> *minValue(Node<T> *root) {
   return minValue(root->left);
 }
 
-template <typename T> Node<T> *insert(Node<T> *&root, T item) {
+template <typename T> Node<T> *insert(Node<T> *&root, T data) {
   if (root == nullptr) {
-    return createNode(item);
+    return createNode(data);
   }
 
-  Node<T> *z = createNode(item);
+  Node<T> *z = createNode(data);
   Node<T> *y = nullptr;
   Node<T> *x = root;
-
   while (x != nullptr) {
     y = x;
     if (z->data < x->data) {
@@ -100,7 +97,6 @@ template <typename T> Node<T> *insert(Node<T> *&root, T item) {
       x = x->right;
     }
   }
-  z->parent = y;
   if (z->data < y->data) {
     y->left = z;
   } else {
@@ -108,12 +104,15 @@ template <typename T> Node<T> *insert(Node<T> *&root, T item) {
   }
 
   int b = getBalance(root);
+  // Left heavy
   if (b > 1) {
     if (getBalance(root->left) < 0) {
       root->left = leftRotate(root->left); // Left-Right Case
     }
     return rightRotate(root); // Left-Left Case
-  } else if (b < -1) {
+  }
+  // Right heavy
+  else if (b < -1) {
     if (getBalance(root->right) > 0) {
       root->right = rightRotate(root->right); // Right-Left Case
     }
@@ -151,8 +150,8 @@ template <typename T> void purge(Node<T> *&root) {
   if (root == nullptr) {
     return;
   }
-  deleteAllNodes(root->left);
-  deleteAllNodes(root->right);
+  purge(root->left);
+  purge(root->right);
   delete root;
   root = nullptr;
 }
